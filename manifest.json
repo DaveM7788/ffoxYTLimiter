@@ -27,6 +27,11 @@
   "options_ui": {
     "page": "/pages/options.html"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "davesprojects7@gmail.com"
+    }
+  },
   "permissions": [
     "tabs",
     "storage"
