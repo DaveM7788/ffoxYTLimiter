@@ -65,7 +65,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 chrome.tabs.onUpdated.addListener(function(tabId, changedInfo, tab) {
 	checkReset();
-	if(tab.active && changedInfo.url){
+	if (tab.active && changedInfo.url){
 		currentTab = tab;
 		checkTabForYouTube(changedInfo.url)
 	}
@@ -86,14 +86,14 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 });
 
 function checkBrowserFocus(){
-	if(typeof timer != 'undefined') {
+	if (typeof timer != 'undefined') {
 		chrome.windows.getLastFocused(function(window){
 			if (window && window.focused) {
 				if (!onYoutube) {
 					var getInfo = {populate: true};
 					chrome.windows.getLastFocused(getInfo, function(window) {
 						for(var i = 0; i < window.tabs.length; i++) {
-							if(window.tabs[i].active) {
+							if (window.tabs[i].active) {
 								checkTabForYouTube(window.tabs[i].url)
 							}
 						}
@@ -104,7 +104,7 @@ function checkBrowserFocus(){
 					var getInfo = {populate: true};
 					chrome.windows.getLastFocused(getInfo, function(window) {
 						for(var i = 0; i < window.tabs.length; i++) {
-							if(window.tabs[i].active) {
+							if (window.tabs[i].active) {
 								checkTabForYouTube(window.tabs[i].url)
 							}
 						}
@@ -133,7 +133,7 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
 			var getInfo = {populate: true};
 			chrome.windows.getLastFocused(getInfo, function(window) {
 				for(var i = 0; i < window.tabs.length; i++) {
-					if(window.tabs[i].active) {
+					if (window.tabs[i].active) {
 						checkTabForYouTube(window.tabs[i].url)
 					}
 				}
@@ -182,7 +182,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				if (checkBrowserFocusTimer == null)
 					checkBrowserFocusTimer = setInterval(checkBrowserFocus, 1000);
 
-				if(typeof timer != 'undefined') {
+				if (typeof timer != 'undefined') {
 					// stop timer because active window must be settings page
 					onYoutube = false;
 					stopTime();
