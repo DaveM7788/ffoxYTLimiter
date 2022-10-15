@@ -1,5 +1,3 @@
-ga('send', 'pageview', '/options.html');
-
 chrome.storage.local.get({"limitOverrides":true}, function(data) {
 	if (data.limitOverrides == true) {
 		$('#limitOverrides').prop('checked', true);
@@ -73,7 +71,6 @@ $("#saveMinutes").click(function() {
 		minutes = 1439;
 	}
 	$("#minutes").val(minutes);
-	ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated time limit', eventValue: minutes});
 
 	chrome.storage.local.set({"timeLimit": minutes, "timeLeft": minutes*60}, function() {
 		chrome.runtime.sendMessage({
@@ -91,7 +88,6 @@ $("#saveOverrideLimit").click(function() {
 		overrideLimit = 1000;
 	}
 	$("#overrideLimit").val(overrideLimit);
-	ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated override limit', eventValue: overrideLimit});
 
 	chrome.storage.local.set({"overrideLimit": overrideLimit, "currentOverrideCount": overrideLimit}, function() {
 		alert("Override Limit Saved");
@@ -102,7 +98,6 @@ $("#saveTime").click(function() {
 	var resetTime = $("#time").val();
 	var resetHour = parseInt(resetTime.split(":")[0]);
 	var resetMinute = parseInt(resetTime.split(":")[1]);
-	ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated reset time', eventLabel: resetTime, eventValue: resetHour*60+resetMinute});
 	chrome.storage.local.set({"resetTime": resetTime}, function() {
 		chrome.runtime.sendMessage({
 			msg: "resetTimeUpdated"
@@ -114,11 +109,9 @@ $("#saveTime").click(function() {
 
 $('#pauseOutOfFocus').change(function() {
 	if (this.checked) {
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated pause out of focus', eventLabel: "true", eventValue: 1});
 		chrome.storage.local.set({"pauseOutOfFocus": true});
 		chrome.runtime.sendMessage({msg: "pauseOutOfFocus", val: true});
 	} else {
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated pause out of focus', eventLabel: "false", eventValue: 0});
 		chrome.storage.local.set({"pauseOutOfFocus": false});
 		chrome.runtime.sendMessage({msg: "pauseOutOfFocus", val: false});
 	}
@@ -126,11 +119,9 @@ $('#pauseOutOfFocus').change(function() {
 
 $('#youtubekidsEnabled').change(function() {
 	if (this.checked) {
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated YouTube Kids enabled', eventLabel: "true", eventValue: 1});
 		chrome.storage.local.set({"youtubekidsEnabled": true});
 		chrome.runtime.sendMessage({msg: "youtubekidsEnabled", val: true});
 	} else {
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated YouTube Kids enabled', eventLabel: "false", eventValue: 0});
 		chrome.storage.local.set({"youtubekidsEnabled": false});
 		chrome.runtime.sendMessage({msg: "youtubekidsEnabled", val: false});
 	}
@@ -139,11 +130,9 @@ $('#youtubekidsEnabled').change(function() {
 $('#limitOverrides').change(function() {
 	if (this.checked) {
 		$('#overrideLimitRow').css("visibility", "visible");
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated limit overrides toggle', eventLabel: "true", eventValue: 1});
 		chrome.storage.local.set({"limitOverrides": true});
 	} else {
 		$('#overrideLimitRow').css("visibility", "hidden");
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated limit overrides toggle', eventLabel: "false", eventValue: 0});
 		chrome.storage.local.set({"limitOverrides": false});
 	}
 });
@@ -158,7 +147,6 @@ $("#customizeLimits").change(function() {
 			$("#minutes").val(data.timeLimit);
 		});
 		populateDayLimits();
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated customize limits', eventLabel: "true", eventValue: 1});
 	} else {
 		chrome.storage.local.set({"customizeLimits": false});
 		$("#customLimitsDiv").hide();
@@ -171,7 +159,6 @@ $("#customizeLimits").change(function() {
 		chrome.runtime.sendMessage({
 			msg: "customizeLimitsFalse"
 		});
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated customize limits', eventLabel: "false", eventValue: 0});
 	}
 });
 
@@ -189,7 +176,6 @@ $(".no-limit-input").change(function() {
 				});	
 			});
 		});
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated ' + day + ' no limit', eventLabel: "true", eventValue: 1});
 	} else {
 		var noLimitInput = $(this);
 		chrome.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
@@ -203,7 +189,6 @@ $(".no-limit-input").change(function() {
 			noLimitInput.closest(".day-row").find(".day-minute-input").val(data.timeLimit);
 			noLimitInput.closest(".day-row").find(".save-day-limit, .day-minute-input").prop("disabled", false);
 		});
-		ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated ' + day + ' no limit', eventLabel: "false", eventValue: 0});
 	}
 });
 
@@ -234,5 +219,4 @@ $(".save-day-limit").click(function() {
 			alert(dayUpperCase + " Limit Saved");
 		});
 	});
-	ga('send', {hitType: 'event', eventCategory: 'Settings', eventAction: 'Updated ' + day + ' time limit', eventValue: minutes});
 });

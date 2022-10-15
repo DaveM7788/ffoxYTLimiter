@@ -1,4 +1,4 @@
-console.log("background running")
+console.log("Firefix YouTube-Time extension background.js running")
 
 chrome.runtime.onInstalled.addListener(function (object) {
 	if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
@@ -88,8 +88,8 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 function checkBrowserFocus(){
 	if(typeof timer != 'undefined') {
 		chrome.windows.getLastFocused(function(window){
-			if(window && window.focused) {
-				if(!onYoutube) {
+			if (window && window.focused) {
+				if (!onYoutube) {
 					var getInfo = {populate: true};
 					chrome.windows.getLastFocused(getInfo, function(window) {
 						for(var i = 0; i < window.tabs.length; i++) {
@@ -123,13 +123,13 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
 	checkReset();
 
 	if (pauseOutOfFocus) {
-		if(windowId == chrome.windows.WINDOW_ID_NONE && typeof timer != 'undefined' && onYoutube) {
+		if (windowId == chrome.windows.WINDOW_ID_NONE && typeof timer != 'undefined' && onYoutube) {
 			if (popupOpen)
 				return;
 
 			onYoutube = false;
 			stopTime();
-		} else if(windowId != chrome.windows.WINDOW_ID_NONE) {
+		} else if (windowId != chrome.windows.WINDOW_ID_NONE) {
 			var getInfo = {populate: true};
 			chrome.windows.getLastFocused(getInfo, function(window) {
 				for(var i = 0; i < window.tabs.length; i++) {
@@ -143,7 +143,7 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	switch(request.msg) {
+	switch (request.msg) {
 		case "override":
 			override = request.value;
 			// console.log("override")
@@ -376,7 +376,7 @@ function checkReset() {
 		var resetTime = data.resetTime.split(":");
 		var resetHour = parseInt(resetTime[0]);
 		var resetMinute = parseInt(resetTime[1]);
-		if(!data.lastDate || (today.getDate().toString() != data.lastDate && today.getHours() >= resetHour && today.getMinutes() >= resetMinute)) {
+		if (!data.lastDate || (today.getDate().toString() != data.lastDate && today.getHours() >= resetHour && today.getMinutes() >= resetMinute)) {
 			chrome.storage.local.get({"timeLimit":30, "customizeLimits":false, "dayLimits":{}}, function(data) {
 				var timeLimit = data.timeLimit;
 				var dayLimits = data.dayLimits;

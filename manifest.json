@@ -23,7 +23,9 @@
   	"default_icon": "/images/icon.png",
   	"default_popup": "/pages/popup.html"
   },
-  "options_ui": "/pages/options.html",
+  "options_ui": {
+    "page": "/pages/options.html"
+  },
   "permissions": [
     "tabs",
     "storage"
