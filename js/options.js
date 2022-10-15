@@ -1,16 +1,16 @@
-chrome.storage.local.get({"limitOverrides":true}, function(data) {
+browser.storage.local.get({"limitOverrides":true}, function(data) {
 	if (data.limitOverrides == true) {
 		$('#limitOverrides').prop('checked', true);
 		$('#overrideLimitRow').css("visibility", "visible");
 	}
 });
 
-chrome.storage.local.get({"timeLimit":30}, function(data) {
+browser.storage.local.get({"timeLimit":30}, function(data) {
 	$("#minutes").val(data.timeLimit);
 });
 
 function populateDayLimits() {
-	chrome.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
+	browser.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
 		var dayLimits = data.dayLimits;
 		var dayDivs = $(".day-row").each(function(i) {
 			var day = $(this).data("day");
@@ -31,7 +31,7 @@ function populateDayLimits() {
 	});
 }
 
-chrome.storage.local.get({"customizeLimits":false}, function(data) {
+browser.storage.local.get({"customizeLimits":false}, function(data) {
 	if (data.customizeLimits == true) {
 		$('#customizeLimits').prop('checked', true);
 		$("#minutes, #saveMinutes").prop("disabled", true);
@@ -39,22 +39,22 @@ chrome.storage.local.get({"customizeLimits":false}, function(data) {
 	}
 });
 
-chrome.storage.local.get({"pauseOutOfFocus":true}, function(data) {
+browser.storage.local.get({"pauseOutOfFocus":true}, function(data) {
 	if (data.pauseOutOfFocus == true)
 		$('#pauseOutOfFocus').prop('checked', true);
 });
 
-chrome.storage.local.get({"youtubekidsEnabled":true}, function(data) {
+browser.storage.local.get({"youtubekidsEnabled":true}, function(data) {
 	if (data.youtubekidsEnabled == true)
 		$('#youtubekidsEnabled').prop('checked', true);
 });
 
-chrome.storage.local.get({"overrideLimit":5}, function(data) {
+browser.storage.local.get({"overrideLimit":5}, function(data) {
 	$("#overrideLimit").val(data.overrideLimit);
 });
 
 
-chrome.storage.local.get({"resetTime":"00:00"}, function(data) {
+browser.storage.local.get({"resetTime":"00:00"}, function(data) {
 	$("#time").val(data.resetTime);
 });
 
@@ -72,7 +72,7 @@ $("#saveMinutes").click(function() {
 	}
 	$("#minutes").val(minutes);
 
-	chrome.storage.local.set({"timeLimit": minutes, "timeLeft": minutes*60}, function() {
+	browser.storage.local.set({"timeLimit": minutes, "timeLeft": minutes*60}, function() {
 		chrome.runtime.sendMessage({
 			msg: "timeLimitUpdated"
 		});
@@ -89,7 +89,7 @@ $("#saveOverrideLimit").click(function() {
 	}
 	$("#overrideLimit").val(overrideLimit);
 
-	chrome.storage.local.set({"overrideLimit": overrideLimit, "currentOverrideCount": overrideLimit}, function() {
+	browser.storage.local.set({"overrideLimit": overrideLimit, "currentOverrideCount": overrideLimit}, function() {
 		alert("Override Limit Saved");
 	});
 });
@@ -98,7 +98,7 @@ $("#saveTime").click(function() {
 	var resetTime = $("#time").val();
 	var resetHour = parseInt(resetTime.split(":")[0]);
 	var resetMinute = parseInt(resetTime.split(":")[1]);
-	chrome.storage.local.set({"resetTime": resetTime}, function() {
+	browser.storage.local.set({"resetTime": resetTime}, function() {
 		chrome.runtime.sendMessage({
 			msg: "resetTimeUpdated"
 		});
@@ -109,20 +109,20 @@ $("#saveTime").click(function() {
 
 $('#pauseOutOfFocus').change(function() {
 	if (this.checked) {
-		chrome.storage.local.set({"pauseOutOfFocus": true});
+		browser.storage.local.set({"pauseOutOfFocus": true});
 		chrome.runtime.sendMessage({msg: "pauseOutOfFocus", val: true});
 	} else {
-		chrome.storage.local.set({"pauseOutOfFocus": false});
+		browser.storage.local.set({"pauseOutOfFocus": false});
 		chrome.runtime.sendMessage({msg: "pauseOutOfFocus", val: false});
 	}
 });
 
 $('#youtubekidsEnabled').change(function() {
 	if (this.checked) {
-		chrome.storage.local.set({"youtubekidsEnabled": true});
+		browser.storage.local.set({"youtubekidsEnabled": true});
 		chrome.runtime.sendMessage({msg: "youtubekidsEnabled", val: true});
 	} else {
-		chrome.storage.local.set({"youtubekidsEnabled": false});
+		browser.storage.local.set({"youtubekidsEnabled": false});
 		chrome.runtime.sendMessage({msg: "youtubekidsEnabled", val: false});
 	}
 });
@@ -130,29 +130,29 @@ $('#youtubekidsEnabled').change(function() {
 $('#limitOverrides').change(function() {
 	if (this.checked) {
 		$('#overrideLimitRow').css("visibility", "visible");
-		chrome.storage.local.set({"limitOverrides": true});
+		browser.storage.local.set({"limitOverrides": true});
 	} else {
 		$('#overrideLimitRow').css("visibility", "hidden");
-		chrome.storage.local.set({"limitOverrides": false});
+		browser.storage.local.set({"limitOverrides": false});
 	}
 });
 
 $("#customizeLimits").change(function() {
 	if (this.checked) {
-		chrome.storage.local.set({"customizeLimits": true});
+		browser.storage.local.set({"customizeLimits": true});
 		$("#customLimitsDiv").show();
 		$("#minutes, #saveMinutes").prop("disabled", true);
 
-		chrome.storage.local.get({"timeLimit":30}, function(data) {
+		browser.storage.local.get({"timeLimit":30}, function(data) {
 			$("#minutes").val(data.timeLimit);
 		});
 		populateDayLimits();
 	} else {
-		chrome.storage.local.set({"customizeLimits": false});
+		browser.storage.local.set({"customizeLimits": false});
 		$("#customLimitsDiv").hide();
 		$("#minutes, #saveMinutes").prop("disabled", false);
 
-		chrome.storage.local.set({"dayLimits":{}});
+		browser.storage.local.set({"dayLimits":{}});
 		$(".day-minute-input").val("");
 		$(".no-limit-input").prop('checked', false);
 		$(".save-day-limit, .day-minute-input").prop("disabled", false);
@@ -167,9 +167,9 @@ $(".no-limit-input").change(function() {
 	if (this.checked) {
 		$(this).closest(".day-row").find(".save-day-limit, .day-minute-input").prop("disabled", true);
 		$(this).closest(".day-row").find(".day-minute-input").val("");
-		chrome.storage.local.get({"dayLimits":{}}, function(data) {
+		browser.storage.local.get({"dayLimits":{}}, function(data) {
 			data.dayLimits[day] = false;
-			chrome.storage.local.set({"dayLimits": data.dayLimits}, function() {
+			browser.storage.local.set({"dayLimits": data.dayLimits}, function() {
 				chrome.runtime.sendMessage({
 					msg: "noLimitInputChange",
 					day: day
@@ -178,9 +178,9 @@ $(".no-limit-input").change(function() {
 		});
 	} else {
 		var noLimitInput = $(this);
-		chrome.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
+		browser.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
 			delete data.dayLimits[day];
-			chrome.storage.local.set({"dayLimits": data.dayLimits}, function() {
+			browser.storage.local.set({"dayLimits": data.dayLimits}, function() {
 				chrome.runtime.sendMessage({
 					msg: "noLimitInputChange",
 					day: day
@@ -209,9 +209,9 @@ $(".save-day-limit").click(function() {
 	}
 	minuteInput.val(minutes);
 
-	chrome.storage.local.get({"dayLimits":{}}, function(data) {
+	browser.storage.local.get({"dayLimits":{}}, function(data) {
 		data.dayLimits[day] = minutes;
-		chrome.storage.local.set({"dayLimits": data.dayLimits}, function() {
+		browser.storage.local.set({"dayLimits": data.dayLimits}, function() {
 			chrome.runtime.sendMessage({
 				msg: "dayTimeLimitUpdated",
 				day: day

@@ -1,4 +1,4 @@
-console.log("Firefix YouTube-Time extension background.js running")
+console.log("Firefox YouTube Limiter extension background.js running")
 
 chrome.runtime.onInstalled.addListener(function (object) {
 	if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
@@ -18,13 +18,13 @@ var checkBrowserFocusTimer = null;
 var timer = null;
 var noLimit = false;
 
-// chrome.storage.local.set({"lastDate":(new Date().getDate()-1).toString()}); //for debugging
+// browser.storage.local.set({"lastDate":(new Date().getDate()-1).toString()}); //for debugging
 
 checkReset();
 
 var days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 // Updates noLimit variable
-chrome.storage.local.get({"customizeLimits":false, "dayLimits":{}}, function(data) {
+browser.storage.local.get({"customizeLimits":false, "dayLimits":{}}, function(data) {
 	if (data.customizeLimits) {
 		var today = new Date();
 		var day = days[today.getDay()];
@@ -34,7 +34,7 @@ chrome.storage.local.get({"customizeLimits":false, "dayLimits":{}}, function(dat
 	}
 });
 
-chrome.storage.local.get({"override":override, "pauseOutOfFocus":pauseOutOfFocus, "youtubekidsEnabled":youtubekidsEnabled}, function(data) {
+browser.storage.local.get({"override":override, "pauseOutOfFocus":pauseOutOfFocus, "youtubekidsEnabled":youtubekidsEnabled}, function(data) {
 	override = data.override;
 	pauseOutOfFocus = data.pauseOutOfFocus;
 	youtubekidsEnabled = data.youtubekidsEnabled;
@@ -44,12 +44,12 @@ chrome.storage.local.get({"override":override, "pauseOutOfFocus":pauseOutOfFocus
 	}
 });
 
-chrome.storage.local.get({"timeLeft":timeLeft}, function(data) {
+browser.storage.local.get({"timeLeft":timeLeft}, function(data) {
 	var time = data.timeLeft;
 	if (!Number.isNaN(time))
 		timeLeft = time;
 	else {
-		chrome.storage.local.get({"timeLimit":30}, function(data) {
+		browser.storage.local.get({"timeLimit":30}, function(data) {
 			timeLeft = data.timeLimit*60;
 		});	
 	}
@@ -74,13 +74,13 @@ chrome.tabs.onUpdated.addListener(function(tabId, changedInfo, tab) {
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 	if (tabId) {
 		// Removes id of closed tab from savedVideoURLs and tempOverrideTabs (if present)
-		chrome.storage.local.get({savedVideoURLs:{}, tempOverrideTabs:[]}, function(data) {
+		browser.storage.local.get({savedVideoURLs:{}, tempOverrideTabs:[]}, function(data) {
 			delete data.savedVideoURLs[tabId];
 
 			var index = data.tempOverrideTabs.indexOf(tabId);
 			if (index !== -1)
 				data.tempOverrideTabs.splice(index, 1);
-			chrome.storage.local.set({savedVideoURLs: data.savedVideoURLs, tempOverrideTabs: data.tempOverrideTabs});
+			browser.storage.local.set({savedVideoURLs: data.savedVideoURLs, tempOverrideTabs: data.tempOverrideTabs});
 		});	
 	}
 });
@@ -147,7 +147,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		case "override":
 			override = request.value;
 			// console.log("override")
-			chrome.storage.local.get({"savedVideoURLs":{}, "tempOverrideTabs":[]}, function(data) {
+			browser.storage.local.get({"savedVideoURLs":{}, "tempOverrideTabs":[]}, function(data) {
 				// Effectively setting tempOverride to true for currentTab
 				// (by adding the tab id to the tempOverrideTabs array)
 				var tempOverrideTabs = data.tempOverrideTabs;
@@ -157,7 +157,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				if (!savedVideoURLs[currentTab.id])
 					savedVideoURLs[currentTab.id] = "https://www.youtube.com/";
 
-				chrome.storage.local.set({"override":request.value, "tempOverrideTabs":tempOverrideTabs, "savedVideoURLs":savedVideoURLs}, function() {
+				browser.storage.local.set({"override":request.value, "tempOverrideTabs":tempOverrideTabs, "savedVideoURLs":savedVideoURLs}, function() {
 					chrome.tabs.update(currentTab.id, {url: savedVideoURLs[currentTab.id]});
 				}); 
 			});
@@ -166,7 +166,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			checkReset();
 			break;
 		case "timeLimitUpdated":
-			chrome.storage.local.get({"timeLeft":timeLeft}, function(data) {
+			browser.storage.local.get({"timeLeft":timeLeft}, function(data) {
 				timeLeft = data.timeLeft;
 			});
 			break;
@@ -215,7 +215,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			}
 			break;
 		case "resetTimeUpdated":
-			chrome.storage.local.get({"resetTime":"00:00"}, function(data) {
+			browser.storage.local.get({"resetTime":"00:00"}, function(data) {
 				var now = new Date();
 				var resetTime = data.resetTime.split(":");
 				var resetHour = parseInt(resetTime[0]);
@@ -223,7 +223,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				if (now.getHours() <= resetHour && now.getMinutes() < resetMinute) {
 					// Ensures that time resets when changing resetTime to time in the future
 					// Allows user to test different reset times and see the timer reset
-					chrome.storage.local.set({"lastDate":"-1"});
+					browser.storage.local.set({"lastDate":"-1"});
 				}
 			});
 			break;
@@ -231,7 +231,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			var today = new Date();
 			var day = days[today.getDay()];
 			if (request.day == day) { // day is today
-				chrome.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
+				browser.storage.local.get({"dayLimits":{}, "timeLimit":30}, function(data) {
 					if (day in data.dayLimits && data.dayLimits[day] === false) {
 						noLimit = true;
 						if (timer != null)
@@ -239,7 +239,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 					} else {
 						noLimit = false;
 						timeLeft = data.timeLimit*60;
-						chrome.storage.local.set({"timeLeft": timeLeft}, function() {
+						browser.storage.local.set({"timeLeft": timeLeft}, function() {
 							if (!pauseOutOfFocus) {
 								// In case youtube is currently active in another window
 								checkWindowsForTimerStart();
@@ -253,16 +253,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			var today = new Date();
 			var day = days[today.getDay()];
 			if (request.day == day) { // day is today
-				chrome.storage.local.get({"dayLimits":{}}, function(data) {
+				browser.storage.local.get({"dayLimits":{}}, function(data) {
 					timeLeft = data.dayLimits[day]*60;
-					chrome.storage.local.set({"timeLeft": timeLeft});
+					browser.storage.local.set({"timeLeft": timeLeft});
 				});
 			}
 			break;
 		case "customizeLimitsFalse":
-			chrome.storage.local.get({"timeLimit":30}, function(data) {
+			browser.storage.local.get({"timeLimit":30}, function(data) {
 				timeLeft = data.timeLimit*60;
-				chrome.storage.local.set({"timeLeft": timeLeft});
+				browser.storage.local.set({"timeLeft": timeLeft});
 			});
 			break;
 	}
@@ -289,8 +289,8 @@ function updateTime() {
 		timer = null;
 		blockRedirect();
 	}
-	chrome.browserAction.setBadgeText({"text": formatTime(timeLeft)});
-	chrome.storage.local.set({"timeLeft":timeLeft});
+	browser.browserAction.setBadgeText({"text": formatTimeOnlyMins(timeLeft)});
+	browser.storage.local.set({"timeLeft":timeLeft});
 
 	var views = chrome.extension.getViews({ type: "popup" });
 	if (views.length != 0) {
@@ -304,7 +304,8 @@ function updateTime() {
 
 function startTime() {
 	// console.log("start", timeLeft)
-	chrome.browserAction.setBadgeText({"text": formatTime(timeLeft)});
+	browser.browserAction.setBadgeBackgroundColor({ color: "darkblue" });
+	browser.browserAction.setBadgeText({"text": formatTimeOnlyMins(timeLeft)});
 	timer = setInterval(updateTime, 1000);
 }
 
@@ -312,7 +313,17 @@ function stopTime() {
 	// console.log("stopped", timeLeft)
 	clearInterval(timer);
 	timer = null;
-	chrome.browserAction.setBadgeText({"text": ""});
+	browser.browserAction.setBadgeText({"text": ""});
+}
+
+// FireFox does not allow as long badge text as chrome
+function formatTimeOnlyMins(totalSeconds) {
+	var minutes =  Math.floor(totalSeconds / 60);
+	if (minutes <= 59) {
+		return minutes + "m";
+	} else {
+		return "1h+"
+	}
 }
 
 function formatTime(totalSeconds) {
@@ -347,7 +358,7 @@ function blockRedirect() {
 	// console.log("tabs[0].url: " + currentTab)
 	// console.log(isYoutubeVideo(tabs[0].url))
 
-	chrome.storage.local.get({"savedVideoURLs":{}}, function(data) {
+	browser.storage.local.get({"savedVideoURLs":{}}, function(data) {
 		var videoURLs = data.savedVideoURLs;
 
 		if (isYoutubeVideo(currentTab.url)) {
@@ -355,14 +366,14 @@ function blockRedirect() {
 			chrome.tabs.sendMessage(currentTab.id, {msg:"saveVideoURL"}, function(response){
 				// console.log("response: " + response)
 				videoURLs[currentTab.id] = response;
-				chrome.storage.local.set({"savedVideoURLs": videoURLs}, function() {
+				browser.storage.local.set({"savedVideoURLs": videoURLs}, function() {
 					chrome.tabs.update(currentTab.id, {url: "/pages/blocked.html"});
 				});
 			});
 		} else {
 			// if not on a youtube video
 			videoURLs[currentTab.id] = currentTab.url;
-			chrome.storage.local.set({"savedVideoURLs": videoURLs}, function() {
+			browser.storage.local.set({"savedVideoURLs": videoURLs}, function() {
 				chrome.tabs.update(currentTab.id, {url: "/pages/blocked.html"});
 			});
 		}
@@ -371,13 +382,13 @@ function blockRedirect() {
 }
 
 function checkReset() {
-	chrome.storage.local.get({"lastDate":null, "resetTime":"00:00"}, function(data) {
+	browser.storage.local.get({"lastDate":null, "resetTime":"00:00"}, function(data) {
 		var today = new Date();
 		var resetTime = data.resetTime.split(":");
 		var resetHour = parseInt(resetTime[0]);
 		var resetMinute = parseInt(resetTime[1]);
 		if (!data.lastDate || (today.getDate().toString() != data.lastDate && today.getHours() >= resetHour && today.getMinutes() >= resetMinute)) {
-			chrome.storage.local.get({"timeLimit":30, "customizeLimits":false, "dayLimits":{}}, function(data) {
+			browser.storage.local.get({"timeLimit":30, "customizeLimits":false, "dayLimits":{}}, function(data) {
 				var timeLimit = data.timeLimit;
 				var dayLimits = data.dayLimits;
 
@@ -396,7 +407,7 @@ function checkReset() {
 				if (noLimit && timer != null)
 					stopTime();
 
-				chrome.storage.local.set({
+				browser.storage.local.set({
 					"lastDate":today.getDate().toString(), 
 					"override":false, 
 					"timeLeft":timeLimit*60,
@@ -412,8 +423,8 @@ function checkReset() {
 				timeLeft = timeLimit*60;
 
 				// reset number of available overrides for today
-				chrome.storage.local.get({"overrideLimit":5}, function(data) {
-					chrome.storage.local.set({"currentOverrideCount": data.overrideLimit});
+				browser.storage.local.get({"overrideLimit":5}, function(data) {
+					browser.storage.local.set({"currentOverrideCount": data.overrideLimit});
 				});
 
 			});
@@ -434,7 +445,7 @@ function checkOverride(url) {
 
 	// allows user to override and go back to most recent video
 	// but not go to any other videos
-	chrome.storage.local.get({savedVideoURLs:{}, tempOverrideTabs:[]}, function(data) {
+	browser.storage.local.get({savedVideoURLs:{}, tempOverrideTabs:[]}, function(data) {
 		// console.log("current url: " + url);
 		// console.log("allowed url: " + data.savedVideoURLs);
 
@@ -461,7 +472,7 @@ function checkOverride(url) {
 			if (index !== -1)
 				tempOverrideTabs.splice(index, 1);
 
-			chrome.storage.local.set({savedVideoURLs: videoURLs, tempOverrideTabs: tempOverrideTabs}, function() {
+			browser.storage.local.set({savedVideoURLs: videoURLs, tempOverrideTabs: tempOverrideTabs}, function() {
 				chrome.tabs.update(currentTab.id, {url: "/pages/blocked.html"});
 			});
 

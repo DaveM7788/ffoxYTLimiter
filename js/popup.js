@@ -24,13 +24,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			$("#time").addClass("noLimit");
 			$("#time").text("No time limit");
 		} else {
-			chrome.storage.local.get("timeLeft", function(data) {
+			browser.storage.local.get("timeLeft", function(data) {
 				$("#time").removeClass("noLimit");
 				$("#time").text(formatTime(data.timeLeft) + " remaining");
 			});
 		}
 
-		chrome.storage.local.get("override", function(data) {
+		browser.storage.local.get("override", function(data) {
 			if (data.override) {
 				$("#override").show();
 			}

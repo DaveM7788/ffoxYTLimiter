@@ -1,11 +1,12 @@
 {
   "manifest_version": 2,
-  "name": "YouTube Time",
-  "description": "Prevent procrastination by setting a daily time limit for your YouTube usage.",
-  "version": "1.4.5",
+  "name": "YouTube Limiter",
+  "description": "Set a daily time limit for watching YouTube videos. This extension is a port of Chris Smith's YouTube Time chrome extension",
+  "version": "1.0.0",
   "icons":
   {
-    "128": "images/icon - 128.png"
+    "48": "/images/ffytlimiter48.png",
+    "128": "/images/ffytlimiter128.png"
   },
   "background": {
   	"scripts": ["background.js"]
@@ -20,7 +21,7 @@
     }
   ],
   "browser_action": {
-  	"default_icon": "/images/icon.png",
+  	"default_icon": "/images/ffytlimitersvg.svg",
   	"default_popup": "/pages/popup.html"
   },
   "options_ui": {
